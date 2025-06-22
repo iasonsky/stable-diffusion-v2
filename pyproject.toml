@@ -27,7 +27,8 @@ dependencies = [
     "datasets>=3.1.0",
     "scikit-image>=0.19.3",
     "xformers>=0.0.22",
-    "clip"
+    "clip",
+    "lpips>=0.1.4",
 ]
 
 [build-system]

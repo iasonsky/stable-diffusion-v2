@@ -20,11 +20,20 @@ chmod +x ./install_git_lfs.sh
 2. Set up Git LFS and download model weights:
 
 ```bash
+echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 git lfs install
-git clone https://huggingface.co/stabilityai/stable-diffusion-2-1 /scratch-shared/holy-triangle/weights/stable-diffusion-2-1
+git clone https://huggingface.co/stabilityai/stable-diffusion-2-1 /scratch-shared/scur0204/stable-diffusion-2-1
 ```
 
+3. Move to local dir to make inference faster
+cp /scratch-shared/scur0204/stable-diffusion-2-1/v2-1_768-ema-pruned.safetensors  ./weights
+
 ---
+
+git config --global user.name "Thijmen Nijdam"
+
+git config --global user.name "thijmen.nijdam@gmail.com"
+
 
 # 🚀 Using UV
 
@@ -131,3 +140,26 @@ uv run python scripts/txt2img.py \
   --ref_img "data/cat.jpg" \
   --ref_blend_weight 0 \
   --aligner_model_path "/scratch-shared/holy-triangle/weights/img2text_aligner_fixed/flickr30k_cosine/model_best.pth"
+
+
+uv run python scripts/txt2img.py   --prompt "a photo of a cat"   --ckpt "./weights/v2-1_768-ema-pruned.ckpt"   --config "configs/stable-diffusion/v2-inference-v.yaml"   --H 768 --W 768   --ref_img "data/doggo.jpg"   --ref_blend_weight "0"   --aligner_version v1   --aligner_dataset coco   --aligner_loss "combined"   --fusion_token_type "all"   --fusion_type "concat"   --calculate_clip_score
+
+
+# Get LPIPS for all alpha_blend experiments with alpha=0.3
+python scripts/quantitative_metrics/compute_lpips_score.py \
+  --base_path outputs/txt2img-samples \
+  --fusion_type alpha_blend \
+  --alpha 0.3 \
+  --backbone alex
+
+# Get LPIPS for all concat experiments
+python scripts/quantitative_metrics/compute_lpips_score.py \
+  --base_path outputs/txt2img-samples \
+  --fusion_type concat \
+  --backbone vgg
+
+# Use different LPIPS backbone
+python scripts/quantitative_metrics/compute_lpips_score.py \
+  --base_path outputs/txt2img-samples \
+  --fusion_type alpha_blend \
+  --backbone squeeze

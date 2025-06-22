@@ -177,3 +177,4 @@ thijmen.md
 model_checkpoint.ckpt
 weights/*
 my_local_cache/
+checkpoints/
