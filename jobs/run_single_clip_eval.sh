@@ -5,7 +5,7 @@
 #SBATCH --time=01:00:00
 #SBATCH --mem=20G
 
-echo "Starting LPIPS evaluation for: fusion_type=${FUSION_TYPE}, alpha=${ALPHA}"
+echo "Starting CLIP evaluation for: fusion_type=${FUSION_TYPE}, alpha=${ALPHA}"
 echo "Job ID: $SLURM_JOB_ID"
 
 # Path to project root
@@ -23,32 +23,26 @@ mkdir -p "$EVAL_DIR"
 # Base path for experiments
 BASE_PATH="${ROOT_DIR}/outputs/txt2img-samples"
 
-# Backbone to use (from environment variable)
-# BACKBONE is passed via environment variable from launcher script
-
-echo "=== Running LPIPS Evaluation ==="
+echo "=== Running CLIP Evaluation ==="
 echo "Base path: $BASE_PATH"
 echo "Fusion type: $FUSION_TYPE"
 echo "Alpha: $ALPHA"
-echo "Backbone: $BACKBONE"
 echo "Output file: $OUTPUT_FILE"
 echo ""
 
 # Build the command based on whether alpha is specified
 if [ "$ALPHA" = "none" ]; then
     # For concat fusion (no alpha parameter)
-    CMD="uv run python scripts/quantitative_metrics/compute_lpips_score.py \
+    CMD="uv run python scripts/quantitative_metrics/compute_clip_score.py \
       --base_path \"$BASE_PATH\" \
       --fusion_type \"$FUSION_TYPE\" \
-      --backbone \"$BACKBONE\" \
       --output_file \"$OUTPUT_FILE\""
 else
     # For alpha_blend fusion (with alpha parameter)
-    CMD="uv run python scripts/quantitative_metrics/compute_lpips_score.py \
+    CMD="uv run python scripts/quantitative_metrics/compute_clip_score.py \
       --base_path \"$BASE_PATH\" \
       --fusion_type \"$FUSION_TYPE\" \
       --alpha \"$ALPHA\" \
-      --backbone \"$BACKBONE\" \
       --output_file \"$OUTPUT_FILE\""
 fi
 
@@ -69,9 +63,9 @@ try:
         data = json.load(f)
     summary = data['summary']
     print(f\"Processed {summary['total_samples']} samples from {summary['total_folders']} folders\")
-    if summary['overall_avg_lpips'] is not None:
-        print(f\"Average LPIPS: {summary['overall_avg_lpips']:.4f} (±{summary['overall_std_lpips']:.4f})\")
-        print(f\"Min LPIPS: {summary['overall_min_lpips']:.4f}, Max LPIPS: {summary['overall_max_lpips']:.4f}\")
+    if summary['overall_avg_clip'] is not None:
+        print(f\"Average CLIP: {summary['overall_avg_clip']:.4f} (±{summary['overall_std_clip']:.4f})\")
+        print(f\"Min CLIP: {summary['overall_min_clip']:.4f}, Max CLIP: {summary['overall_max_clip']:.4f}\")
     else:
         print('No valid results found')
 except Exception as e:
@@ -81,7 +75,7 @@ except Exception as e:
     echo "$SUMMARY"
     
     # Append summary to shared results file
-    SHARED_RESULTS_FILE="${EVAL_DIR}/lpips_summary_${BACKBONE}.json"
+    SHARED_RESULTS_FILE="${EVAL_DIR}/clip_summary.json"
     echo "Appending summary to shared results file: $SHARED_RESULTS_FILE"
     
     python -c "
@@ -98,15 +92,14 @@ summary_entry = {
     'method': '$FUSION_TYPE' + ('_alpha' + '$ALPHA' if '$ALPHA' != 'none' else ''),
     'fusion_type': '$FUSION_TYPE',
     'alpha': '$ALPHA' if '$ALPHA' != 'none' else None,
-    'backbone': '$BACKBONE',
     'timestamp': datetime.now().isoformat(),
     'job_id': os.getenv('SLURM_JOB_ID', 'unknown'),
     'total_samples': data['summary']['total_samples'],
     'total_folders': data['summary']['total_folders'],
-    'avg_lpips': data['summary']['overall_avg_lpips'],
-    'std_lpips': data['summary']['overall_std_lpips'],
-    'min_lpips': data['summary']['overall_min_lpips'],
-    'max_lpips': data['summary']['overall_max_lpips'],
+    'avg_clip': data['summary']['overall_avg_clip'],
+    'std_clip': data['summary']['overall_std_clip'],
+    'min_clip': data['summary']['overall_min_clip'],
+    'max_clip': data['summary']['overall_max_clip'],
     'detailed_file': '$OUTPUT_FILE'
 }
 
@@ -118,7 +111,7 @@ if os.path.exists(shared_file):
 else:
     shared_data = {
         'evaluation_info': {
-            'backbone': '$BACKBONE',
+            'model': 'ViT-B/32',
             'base_path': '$BASE_PATH',
             'created': datetime.now().isoformat()
         },
@@ -143,4 +136,4 @@ else
 fi
 
 echo ""
-echo "LPIPS evaluation job completed successfully!" 
+echo "CLIP evaluation job completed successfully!" 

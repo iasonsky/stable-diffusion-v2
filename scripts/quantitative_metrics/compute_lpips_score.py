@@ -84,6 +84,8 @@ def main():
     # Initialize LPIPS model
     print(f"Loading LPIPS model with {args.backbone} backbone...")
     lpips_model = lpips.LPIPS(net=args.backbone).to(args.device)
+    lpips_model.eval()  # Ensure model is in evaluation mode
+    print(f"LPIPS model loaded and set to eval mode")
     
     # Find all experiment folders
     experiment_folders = []
