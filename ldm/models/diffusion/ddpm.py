@@ -1038,8 +1038,6 @@ class LatentDiffusion(DDPM):
                     blended_text_cond = self.cross_attention_fusion(self.stored_text_cond, image_token)  # [B, 77, D] -> [B, 77, D]
                 
                 elif self.fusion_type == "concat":
-                    print(image_token.shape)
-                    print(self.stored_text_cond.shape)
                     # Original concatenation approach
                     if self.ref_first:
                         blended_text_cond = torch.cat([image_token, self.stored_text_cond], dim=1)  # [B, N_selected+77, D]
@@ -1067,8 +1065,6 @@ class LatentDiffusion(DDPM):
                                     # Reduced strength for unconditioned part
                     ], dim=0)
                 else:
-                    print(first_dims_padded.shape)
-                    print(blended_text_cond.shape)
                     cond = torch.cat([
                         first_dims_padded,   
                         blended_text_cond  # Full strength for conditioned part

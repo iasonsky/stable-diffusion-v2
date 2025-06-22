@@ -82,7 +82,7 @@ def parse_args():
         type=str,
         nargs="?",
         help="dir to write results to",
-        default=f"outputs/txt2img-samples/{datetime.now().strftime('%d-%m-%Y_%H-%M-%S')}"
+        default=f"outputs/txt2img-samples/{os.getenv('JOB_ID', datetime.now().strftime('%d-%m-%Y_%H-%M-%S'))}"
     )
     parser.add_argument(
         "--steps",
