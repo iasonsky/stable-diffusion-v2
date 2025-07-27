@@ -64,8 +64,6 @@ Per default, the attention operation of the model is evaluated at full precision
 - The above model is finetuned from _SD 2.0-base_, which was trained as a standard noise-prediction model on 512x512 images and is also made available.
 - Added a [x4 upscaling latent text-guided diffusion model](#image-upscaling-with-stable-diffusion).
 - New [depth-guided stable diffusion model](#depth-conditional-stable-diffusion), finetuned from _SD 2.0-base_. The model is conditioned on monocular depth estimates inferred via [MiDaS](https://github.com/isl-org/MiDaS) and can be used for structure-preserving img2img and shape-conditional synthesis.
-
-  ![d2i](assets/stable-samples/depth2img/depth2img01.png)
 - A [text-guided inpainting model](#image-inpainting-with-stable-diffusion), finetuned from SD _2.0-base_.
 
 We follow the [original repository](https://github.com/CompVis/stable-diffusion) and provide basic inference scripts to sample from the models.
